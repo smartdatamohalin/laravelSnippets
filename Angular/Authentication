@@ -1,0 +1,125 @@
+  /**
+   * Function to handle login function
+   */ 
+ 
+ handleLogin(){   
+
+    if(this.loginForm.invalid){
+      return;
+    }
+
+     var data:any;
+
+     if(checkForEmail.test(this.loginForm.value.companyoremail)){
+      data = {
+         email: this.loginForm.value.companyoremail,
+         password: this.loginForm.value.password
+       }
+     }else{
+       data = {
+         company_name: this.loginForm.value.companyoremail,
+         password: this.loginForm.value.password
+       }
+     }  
+
+    const data = {
+      email: this.loginForm.value.companyoremail,
+      password: this.loginForm.value.password
+    }
+
+    this.academicStaffService.login(data).subscribe(response =>{
+      if(response.status == "success"){
+        this.authService.setAuthFromLocalStorage(response);
+        Swal.fire({
+          title: "Login Successfull!",
+          text: "You have been successfully loggedin!",
+          icon: "success",
+        });
+        this.router.navigateByUrl('academic-staff/dashboard')
+      }else{
+        Swal.fire({
+          title: "Login Error!",
+          text: "Invalid credentials!",
+          icon: "error",
+        });
+      }
+      
+    },(error) => {
+      Swal.fire({
+        title: "Connection Error!",
+        text: "Please try after sometime!",
+        icon: "error",
+      });
+    });
+
+  }
+
+   /**
+   * Function to handle Signup funciton
+   */ 
+   handleSignup(){   
+    this.submitted = true;
+
+    if(this.signupForm.invalid){
+      return;
+    }
+
+    var privacyPolicy;
+    var newsLetter;
+    var comanyIndustryArr = [];
+    for (let i = 0; i < this.signupForm.value.companyindustry.length; i++) {
+      const element = this.signupForm.value.companyindustry[i];
+      comanyIndustryArr.push(element.id);
+    }
+
+    if(this.signupForm.value.privacypolicy){
+      privacyPolicy = 1;
+    }else{
+      privacyPolicy = 0;
+    }
+
+    if(this.signupForm.value.newsletter){
+      newsLetter = 1;
+    }else{
+      newsLetter = 0;
+    }
+ 
+    const data = {
+        email: this.signupForm.value.email,  
+        institution_website: this.signupForm.value.websiteurl,
+        institution_name: this.signupForm.value.companyname,
+        institution_industry: comanyIndustryArr,
+        password: this.signupForm.value.password,
+        privacy_policy: privacyPolicy,
+        newsletter: newsLetter
+      }
+     
+
+    this.academicStaffService.signup(data).subscribe(response =>{
+      if(response.status == "success"){
+        this.submitted = false; 
+        Swal.fire({
+          title: "Signup Successfull!",
+          text: "You have been successfully signed up!",
+          icon: "success",
+        });
+        this.router.navigateByUrl('login-academic-staff')
+      }else{
+        this.submitted = false;
+        Swal.fire({
+          title: "Signup Error!",
+          text: response.message,
+          icon: "error",
+        });
+      }
+      
+    },(error) => {
+      this.submitted = false;
+      Swal.fire({
+        title: "Connection Error!",
+        text: "Please try after sometime!",
+        icon: "error",
+      });
+    });
+
+  }
